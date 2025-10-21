@@ -7,7 +7,7 @@
 
 ## 📌 Description
 
-**RAIZEL XMD**, également connu sous le nom de **DEVRAIZEL**, est un bot
+**RAIZEL XMD**, également connu sous le nom de **RAÏ_XD**, est un bot
 WhatsApp multi-device basé sur **Baileys v5**.  
 Il automatise les discussions, gère des groupes, exécute des commandes et
 permet d’exploiter pleinement WhatsApp via une interface avancée.

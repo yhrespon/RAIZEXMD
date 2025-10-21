@@ -1,28 +1,29 @@
 <p align="center">
-  <img src="https://files.catbox.moe/jvwq8s.jpeg" alt="RENEGADES_MD Banner" width="90%"/>
+  <img src="[[https://files.catbox.moe/jvwq8s.jpeg]
+    " alt="RAIZEL XMD Banner" width="90%"/>
 </p>
 
+
 ```
-# ⚡ RENEGADES_MD (alias DEVCADIS) ⚡
+# ⚡ RAIZEL XMD BOT ⚡
 ------------------------------------------------------------------------
 
 ## 📌 Description
 
-**RENEGADES_MD**, également connu comme **DEVCADIS**, est un bot
-WhatsApp multi-device basé sur **Baileys**.\
-Il permet d'automatiser les discussions, d'exécuter des commandes et de
-tirer pleinement parti de WhatsApp via une interface avancée.
+**RAIZEL XMD**, également connu sous le nom de **DEVRAIZEL**, est un bot
+WhatsApp multi-device basé sur **Baileys v5**.  
+Il automatise les discussions, gère des groupes, exécute des commandes et
+permet d’exploiter pleinement WhatsApp via une interface avancée.
 
 ------------------------------------------------------------------------
 
-## 🚀 Déploiement
+## 🚀 Déploiement rapide
 
-### 1. Cloner le dépôt
+### 1️⃣ Cloner le dépôt
 
-``` bash
-git clone https://github.com/DEVCADIS/DEVCADIS.git
-cd DEVCADIS
-```
+```bash
+git clone https://github.com/yhrespon/RAIZEXMD-launcher.gitp
+cd RAIZEXMD-launcher
 
 ### 2. Installer les dépendances
 
@@ -42,10 +43,10 @@ node index.js
 
 1.  Inscris-toi sur [Render](https://render.com).
 2.  Crée un **nouveau Web Service**, connecte ton compte GitHub et
-    sélectionne le dépôt `DEVCADIS`.
+    sélectionne le dépôt `git clone https://github.com/yhrespon/RAIZEXMD-launcher.git
+`.
 3.  Configure :
-    -   **Environment** : `Node`
-
+   
     -   **Build Command** :
 
         ``` bash
@@ -61,35 +62,24 @@ node index.js
 
 ------------------------------------------------------------------------
 
-## ⚙️ Configuration
-
-Crée un fichier **`.env`** à la racine avec les variables suivantes :
-
-``` env
-PREFIXE=.
-DOSSIER_AUTH=auth_baileys
-NUMBER=‪237xxxxxx
-USE_QR=false
-LOG_LEVEL=info
-RECONNECT_DELAY=5000
-STATUS_REACT=💚
-```
-
-------------------------------------------------------------------------
-
 ## 📂 Structure du projet
 
-    DEVCADIS/
-    │── index.js        # Fichier principal
-    │── package.json    # Dépendances et scripts
-    │── /commands       # Commandes du bot
-    │── /media          # Médias sauvegardés
-    │── /sessions       # Sessions WhatsApp
-    │── .env            # Variables d'environnement
+   
+    RAIZEXMD/
+     │── index.js           
+     │── package.json      
+     │── /commands         
+     │── /media             
+     │── /sessions        
+     │── config.json        
+     │── mode.json        
+     │── sudo.json          
 
 ------------------------------------------------------------------------
 
 ## 👨‍💻 Auteur
 
-**RENEGADES_MD / DEVCADIS** développé par
-[𝘋𝘌𝘝-𝘙𝘈𝘐𝘡𝘌𝘓]([https://github.com/TON_USER](https://github.com/DEVCADIS/DEVCADIS.git))
+RAIZEL XMD / DEVRAIZEL développé par
+DEV-RAIZEL
+
+> _*Powered by RAIZEL XMD Bot*_

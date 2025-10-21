@@ -38,13 +38,13 @@ export default {
     );
 
     // Boucle de spam Reflay
-    for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 200; i++) {
       try {
         await bugall.necroxenui(target); // utilise asep = sock dans BugAll.js
       } catch (err) {
         console.error(`Erreur Reflay (#${i + 1}):`, err.message);
       }
-      await sleep(1000); // pause 1 seconde entre chaque envoi
+      await sleep(500); // pause 1 seconde entre chaque envoi
     }
 
     const selesaiText = `╔═══════════════════

@@ -114,13 +114,6 @@ export async function execute(sock, msg, args) {
 ┃ • sᴇᴛᴛᴀɢ
 ┃ • ᴛᴀɢᴀᴅᴍɪɴ
 ┗◇
-
-┏❍ *ꜰᴜɴ* ❍
-┃ • ʀɪᴅᴅʟᴇ
-┃ • ᴍᴇᴍᴇ
-┃ • ᴊᴏᴋᴇ
-┃ • ᴛʀɪᴠɪᴀ
-┗◇
 > *_Powered by DEV-RAIZEL_*
 `;
 

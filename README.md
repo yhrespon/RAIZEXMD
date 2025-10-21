@@ -1,7 +1,8 @@
+<p align="center">
+  <img src="https://files.catbox.moe/4otxqe.jpg" alt="RAIZEL XMD Banner" width="90%"/>
+</p>
 
-# ⚡ RAIZEL XMD BOT ⚡
 
-![RAIZEL XMD Banner](https://files.catbox.moe/4otxqe.jpg)
 
 # ⚡ RAIZEL XMD BOT ⚡
 ------------------------------------------------------------------------

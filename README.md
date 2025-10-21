@@ -1,10 +1,8 @@
+
 <p align="center">
   <img src="https://files.catbox.moe/4otxqe.jpg" alt="RAIZEL XMD Banner" width="90%"/>
 </p>
 
-
-
-``` 
 # ⚡ RAIZEL XMD BOT ⚡
 ------------------------------------------------------------------------
 
@@ -15,8 +13,6 @@ WhatsApp multi-device basé sur **Baileys v5**.
 Il automatise les discussions, gère des groupes, exécute des commandes et
 permet d’exploiter pleinement WhatsApp via une interface avancée.
 
-                          ```
-
 ------------------------------------------------------------------------
 
 ## 🚀 Déploiement rapide
@@ -24,66 +20,78 @@ permet d’exploiter pleinement WhatsApp via une interface avancée.
 ### 1️⃣ Cloner le dépôt
 
 ```bash
-git clone https://github.com/yhrespon/RAIZEXMD-launcher.gitp
-cd RAIZEXMD-launcher
+git clone https://github.com/yhrespon/RAIZEXMD.git
+cd RAIZEXMD
+```
 
-### 2. Installer les dépendances
+### 2️⃣ Installer les dépendances
 
-``` bash
+```bash
 npm install
+```
 
-     ```
+### 3️⃣ Lancer le bot
 
-### 3. Lancer localement
-
-``` bash
+```bash
 node index.js
+```
 
-      ```
+> Toutes les configurations (préfixe, mode privé/public, utilisateurs sudo, etc.) sont gérées directement dans `index.js` et via les fichiers JSON :  
+> - `config.json` → configuration utilisateur  
+> - `mode.json` → mode public/privé  
+> - `sudo.json` → liste des utilisateurs sudo
 
 ------------------------------------------------------------------------
 
-## ☁️ Déploiement sur Render
+## ☁️ Déploiement automatique via Launcher
 
-1.  Inscris-toi sur [Render](https://render.com).
-2.  Crée un **nouveau Web Service**, connecte ton compte GitHub et
-    sélectionne le dépôt `git clone https://github.com/yhrespon/RAIZEXMD-launcher.git
-`.
-3.  Configure :
-   
-    -   **Build Command** :
+Le **launcher** permet de cloner, mettre à jour, installer et démarrer le bot automatiquement :
 
-        ``` bash
-        npm install
-        ```
+### 1️⃣ Cloner le launcher
 
-    -   **Start Command** :
+```bash
+git clone https://github.com/yhrespon/RAIZEXMD-launcher.git
+cd RAIZEXMD-launcher
+npm install
+```
 
-        ``` bash
-        node index.js
-        ```
-4.  Clique sur **Deploy** pour lancer ton bot en ligne 🎉
+### 2️⃣ Lancer le launcher
+
+```bash
+npm start
+```
+
+> Le launcher vérifie si le projet est déjà présent, met à jour automatiquement et démarre le bot RAIZEXMD.
 
 ------------------------------------------------------------------------
 
 ## 📂 Structure du projet
 
-   
-    RAIZEXMD/
-     │── index.js           
-     │── package.json      
-     │── /commands         
-     │── /media             
-     │── /sessions        
-     │── config.json        
-     │── mode.json        
-     │── sudo.json          
+```
+RAIZEXMD/
+│── index.js           # Fichier principal
+│── package.json       # Dépendances et scripts
+│── /commands          # Commandes du bot (owner, menu, kick, etc.)
+│── /media             # Médias sauvegardés (images, sons, vidéos)
+│── /sessions          # Sessions WhatsApp
+│── config.json        # Configuration utilisateur
+│── mode.json          # Mode public/privé
+│── sudo.json          # Liste des utilisateurs sudo
+```
+
+```
+RAIZEXMD-launcher/
+│── index.js           # Script de lancement automatique
+│── package.json       # Dépendances et scripts
+```
 
 ------------------------------------------------------------------------
 
 ## 👨‍💻 Auteur
 
-RAIZEL XMD / DEVRAIZEL développé par
-DEV-RAIZEL
+**RAIZEL XMD / DEVRAIZEL** développé par  
+[DEV-RAIZEL](https://github.com/TON_USER)
 
-> _*Powered by RAIZEL XMD Bot*_
+------------------------------------------------------------------------
+
+> _Powered by RAIZEL XMD Bot_

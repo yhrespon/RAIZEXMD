@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://files.catbox.moe/4otxqe.jpg" alt="RENEGADES_MD Banner" width="90%"/>
+  <img src="https://files.catbox.moe/4otxqe.jpg" alt="RENEGADES_MD Banner" width="70%"/>
 </p>
 
 

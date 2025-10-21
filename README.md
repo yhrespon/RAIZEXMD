@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yhrespon/RAIZEXMD/refs/heads/main/banner.jpg" alt="RAIZEL XMD Banner" width="90%"/>
+  <img src="[https://raw.githubusercontent.com/yhrespon/RAIZEXMD/refs/heads/main/banner.jpg](https://raw.githubusercontent.com/yhrespon/RAIZEL-CRASH/refs/heads/main/banner.jpg)" alt="RAIZEL XMD Banner" width="90%"/>
 </p>
 
 # ⚡ RAIZEL XMD BOT ⚡

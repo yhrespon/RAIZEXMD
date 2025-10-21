@@ -89,7 +89,7 @@ RAIZEXMD-launcher/
 ## 👨‍💻 Auteur
 
 **RAIZEL XMD / DEVRAIZEL** développé par  
-[DEV-RAIZEL](https://github.com/yhrespon)
+[DEV-RAIZEL]([https://github.com/yhrespon](https://github.com/yhrespon/RAIZEXMD.git))
 
 ------------------------------------------------------------------------
 

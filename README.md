@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="[[https://files.catbox.moe/jvwq8s.jpeg]
-    " alt="RAIZEL XMD Banner" width="90%"/>
+  <img src="https://files.catbox.moe/4otxqe.jpg" alt="RAIZEL XMD Banner" width="90%"/>
 </p>
 
 
-```
+
+``` 
 # ⚡ RAIZEL XMD BOT ⚡
 ------------------------------------------------------------------------
 
@@ -14,6 +14,8 @@
 WhatsApp multi-device basé sur **Baileys v5**.  
 Il automatise les discussions, gère des groupes, exécute des commandes et
 permet d’exploiter pleinement WhatsApp via une interface avancée.
+
+                          ```
 
 ------------------------------------------------------------------------
 
@@ -29,13 +31,15 @@ cd RAIZEXMD-launcher
 
 ``` bash
 npm install
-```
+
+     ```
 
 ### 3. Lancer localement
 
 ``` bash
 node index.js
-```
+
+      ```
 
 ------------------------------------------------------------------------
 

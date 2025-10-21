@@ -93,4 +93,4 @@ RAIZEXMD-launcher/
 
 ------------------------------------------------------------------------
 
-> _Powered by RAIZEL XMD Bot_
+> _Powered by DEV RAIZEL Bot_

@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="https://files.catbox.moe/4otxqe.jpg" alt="RENEGADES_MD Banner" width="70%"/>
+  <img src="https://raw.githubusercontent.com/yhrespon/RAIZEXMD/refs/heads/main/banner.jpg" alt="RAIZEL XMD Banner" width="90%"/>
 </p>
-
 
 # ⚡ RAIZEL XMD BOT ⚡
 ------------------------------------------------------------------------

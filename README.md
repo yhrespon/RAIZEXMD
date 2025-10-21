@@ -1,10 +1,6 @@
-<table align="center">
-  <tr>
-    <td>
-      <img src="https://files.catbox.moe/4otxqe.jpg" alt="RAIZEL XMD Banner" width="90%">
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="https://files.catbox.moe/jvwq8s.jpeg" alt="RENEGADES_MD Banner" width="90%"/>
+</p>
 
 
 # ⚡ RAIZEL XMD BOT ⚡

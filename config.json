@@ -1,18 +1,3 @@
 {
-  "users": {
-    "120363422053096443@g.us": {
-      "prefix": ".",
-      "cleanPrefix": false
-    },
-    "120363403702757966@g.us": {
-      "prefix": "🥲",
-      "cleanPrefix": true
-    },
-    "237671068400@s.whatsapp.net": {
-      "cleanPrefix": false
-    },
-    "120363423349458068@g.us": {
-      "cleanPrefix": true
-    }
-  }
+  "users": {}
 }

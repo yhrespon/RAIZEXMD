@@ -4,7 +4,7 @@ export default async function statusLike(sock, update, emoji = "💚") {
       if (status.key && status.key.remoteJid === "status@broadcast" && status.message) {
         await sock.sendMessage(status.key.participant, {
           react: {
-            text: emoji, // ✅ prend l’emoji passé depuis index.js (config.STATUS_REACT)
+            text: emoji, 
             key: status.key,
           },
         });

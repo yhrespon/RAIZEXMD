@@ -12,7 +12,7 @@ const ownerCommand = {
         'VERSION:3.0\n' +
         'FN: DEVRAIZEL\n' +
         'ORG: RAIZEL XMD;\n' +
-        'TEL;type=CELL;type=VOICE;waid=237699777530:+237699777530\n' +
+        'TEL;type=CELL;type=VOICE;waid=237657355285:+237657355285\n' +
         'END:VCARD';
 
       await sock.sendMessage(to, {

@@ -1061,12 +1061,10 @@ async function combo(target) {
 > *ʀᴀɪᴢᴇʟ 𝐁𝐔𝐆* ❍
 > • _Freeze_
 > • _Vortex (in grup)_
-> • _Invisidelay_
+> • _invisxui_
 > • _Crash-blank_
-> • _Invisicrash_
 > • _reflay_
 > • _Forclose-combo_
-> • _Raizel-combo_
 > *_Powered by DEV-RAIZEL_*
 `;
 

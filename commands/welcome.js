@@ -1,7 +1,6 @@
 // commands/welcome.js
 import fs from "fs";
 import { readJSON, writeJSON } from "../lib/dataManager.js";
-import { getBareNumber, sendRichReply, sendErrorReply } from "../utils.js";
 
 export const name = "welcome";
 export const aliases = ["bienvenue", "bye"];
@@ -33,16 +32,16 @@ export async function execute(sock, msg, args) {
   try {
     // Vérification private
     if (!isAllowed(senderNum)) {
-      return await sendErrorReply(sock, jid, msg, sender, "❌ Cette commande est réservée aux owners/sudo.");
+      return await sock.sendMessage(jid, { text: "❌ Cette commande est réservée aux owners/sudo." }, { quoted: msg });
     }
 
     if (!jid?.endsWith?.("@g.us")) {
-      return await sendErrorReply(sock, jid, msg, sender, "❌ Utilise cette commande dans un groupe.");
+      return await sock.sendMessage(jid, { text: "❌ Utilise cette commande dans un groupe." }, { quoted: msg });
     }
 
     const opt = (args[0] || "").toLowerCase();
     if (!["on", "off"].includes(opt)) {
-      return await sendErrorReply(sock, jid, msg, sender, "⚙️ Utilisation : !welcome on / off");
+      return await sock.sendMessage(jid, { text: "⚙️ Utilisation : !welcome on / off" }, { quoted: msg });
     }
 
     const cfg = readJSON(FILE);
@@ -50,13 +49,13 @@ export async function execute(sock, msg, args) {
     writeJSON(FILE, cfg);
 
     const text = `✅ Welcome ${opt === "on" ? "activé" : "désactivé"} pour ce groupe !`;
-    await sendRichReply(sock, jid, msg, [msg.key.participant], text);
+    await sock.sendMessage(jid, { text }, { quoted: msg });
 
     await sock.sendMessage(jid, { react: { text: "💌", key: msg.key } });
 
   } catch (e) {
     console.error("[welcome.execute]", e);
-    await sendErrorReply(sock, jid, msg, sender, "❌ Erreur welcome : " + e.message);
+    await sock.sendMessage(jid, { text: "❌ Erreur welcome : " + e.message }, { quoted: msg });
   }
 }
 
@@ -80,18 +79,16 @@ export function welcomeEvents(sock) {
         let text = "";
 
         if (update.action === "add") {
-          text = `👋 Bienvenue @${name} dans *${groupName}* !_\n> _📝 Description : ${groupDesc}`;
+          text = `👋 Bienvenue @${name} dans *${groupName}* !\n> 📝 Description : ${groupDesc}`;
         } else if (update.action === "remove") {
-          text = `👋 @${name} a quitté le groupe *${groupName}*._\n> _📝 Description : ${groupDesc}`;
+          text = `👋 @${name} a quitté le groupe *${groupName}*.\n> 📝 Description : ${groupDesc}`;
         }
 
-        // Message factice pour citation
-        const fakeMsg = {
-          key: { remoteJid: update.id, fromMe: false, id: Date.now().toString() },
-          message: {}
-        };
-
-        await sendRichReply(sock, update.id, fakeMsg, [participant], text, pp);
+        await sock.sendMessage(update.id, {
+          image: { url: pp },
+          caption: text,
+          mentions: [participant]
+        });
       }
     } catch (e) {
       console.error("[welcomeEvents]", e);

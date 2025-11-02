@@ -32,16 +32,16 @@ export async function execute(sock, msg, args) {
   try {
     // Vérification private
     if (!isAllowed(senderNum)) {
-      return await sock.sendMessage(jid, { text: "❌ Cette commande est réservée aux owners/sudo." }, { quoted: msg });
+      return await sock.sendMessage(jid, { text: "> _*❌ Cette commande est réservée aux owners/sudo*_." }, { quoted: msg });
     }
 
     if (!jid?.endsWith?.("@g.us")) {
-      return await sock.sendMessage(jid, { text: "❌ Utilise cette commande dans un groupe." }, { quoted: msg });
+      return await sock.sendMessage(jid, { text: "> _*❌ Utilise cette commande dans un groupe*_." }, { quoted: msg });
     }
 
     const opt = (args[0] || "").toLowerCase();
     if (!["on", "off"].includes(opt)) {
-      return await sock.sendMessage(jid, { text: "⚙️ Utilisation : !welcome on / off" }, { quoted: msg });
+      return await sock.sendMessage(jid, { text: "> _*⚙️ Utilisation : !welcome on / off*_" }, { quoted: msg });
     }
 
     const cfg = readJSON(FILE);
@@ -55,7 +55,7 @@ export async function execute(sock, msg, args) {
 
   } catch (e) {
     console.error("[welcome.execute]", e);
-    await sock.sendMessage(jid, { text: "❌ Erreur welcome : " + e.message }, { quoted: msg });
+    await sock.sendMessage(jid, { text: "> _*❌ Erreur welcome : *_" + e.message }, { quoted: msg });
   }
 }
 
@@ -72,16 +72,35 @@ export function welcomeEvents(sock) {
       const groupDesc = metadata.desc || "📭 Aucune description définie pour ce groupe.";
 
       for (const participant of update.participants) {
+        // Récupération photo + bio
         let pp = "https://files.catbox.moe/2yz2qu.jpg";
         try { pp = await sock.profilePictureUrl(participant, "image"); } catch {}
+
+        let status = "📵 Aucune bio disponible.";
+        try {
+          const res = await sock.fetchStatus(participant);
+          if (res?.status) status = res.status;
+        } catch {}
 
         const name = participant.split("@")[0];
         let text = "";
 
         if (update.action === "add") {
-          text = `👋 Bienvenue @${name} dans *${groupName}* !\n> 📝 Description : ${groupDesc}`;
+          text = `👋 *Bienvenue @${name}* dans *${groupName}* 💫
+
+🧍‍♂️ *Bio du membre :*
+> ${status}
+
+📘 *Description du groupe :*
+> ${groupDesc}`;
         } else if (update.action === "remove") {
-          text = `👋 @${name} a quitté le groupe *${groupName}*.\n> 📝 Description : ${groupDesc}`;
+          text = `👋 *@${name}* a quitté *${groupName}* 💨
+
+🧍‍♂️ *Bio du membre :*
+> ${status}
+
+📘 *Description du groupe :*
+> ${groupDesc}`;
         }
 
         await sock.sendMessage(update.id, {

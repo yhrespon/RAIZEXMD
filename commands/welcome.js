@@ -1,6 +1,8 @@
 // commands/welcome.js
+// commands/welcome.js
 import fs from "fs";
 import { readJSON, writeJSON } from "../lib/dataManager.js";
+import { getBareNumber } from "../index.js"; // ✅ Import manquant ajouté
 
 export const name = "welcome";
 export const aliases = ["bienvenue", "bye"];
@@ -26,36 +28,51 @@ function isAllowed(senderNum) {
 // COMMANDE WELCOME ON/OFF
 export async function execute(sock, msg, args) {
   const jid = msg.key.remoteJid;
-  const sender = msg.pushName || msg.key.participant;
   const senderNum = getBareNumber(msg.key.participant);
 
   try {
     // Vérification private
     if (!isAllowed(senderNum)) {
-      return await sock.sendMessage(jid, { text: "> _*❌ Cette commande est réservée aux owners/sudo*_." }, { quoted: msg });
+      return await sock.sendMessage(
+        jid,
+        { text: "> _*❌ Cette commande est réservée aux owners/sudo.*_" },
+        { quoted: msg }
+      );
     }
 
     if (!jid?.endsWith?.("@g.us")) {
-      return await sock.sendMessage(jid, { text: "> _*❌ Utilise cette commande dans un groupe*_." }, { quoted: msg });
+      return await sock.sendMessage(
+        jid,
+        { text: "> _*❌ Utilise cette commande dans un groupe.*_" },
+        { quoted: msg }
+      );
     }
 
     const opt = (args[0] || "").toLowerCase();
     if (!["on", "off"].includes(opt)) {
-      return await sock.sendMessage(jid, { text: "> _*⚙️ Utilisation : !welcome on / off*_" }, { quoted: msg });
+      return await sock.sendMessage(
+        jid,
+        { text: "> _*⚙️ Utilisation : .welcome on / off*_" },
+        { quoted: msg }
+      );
     }
 
     const cfg = readJSON(FILE);
     cfg[jid] = opt === "on";
     writeJSON(FILE, cfg);
 
-    const text = `✅ Welcome ${opt === "on" ? "activé" : "désactivé"} pour ce groupe !`;
+    const text = `> ✅ *Welcome ${opt === "on" ? "activé" : "désactivé"} pour ce groupe !*`;
     await sock.sendMessage(jid, { text }, { quoted: msg });
 
     await sock.sendMessage(jid, { react: { text: "💌", key: msg.key } });
 
   } catch (e) {
     console.error("[welcome.execute]", e);
-    await sock.sendMessage(jid, { text: "> _*❌ Erreur welcome : *_" + e.message }, { quoted: msg });
+    await sock.sendMessage(
+      jid,
+      { text: `> _*❌ Erreur welcome :*_ ${e.message}` },
+      { quoted: msg }
+    );
   }
 }
 
@@ -69,17 +86,16 @@ export function welcomeEvents(sock) {
 
       const metadata = await sock.groupMetadata(update.id);
       const groupName = metadata.subject;
-      const groupDesc = metadata.desc || "📭 Aucune description définie pour ce groupe.";
+      const groupDesc = metadata.desc || "_📭 Aucune description définie pour ce groupe._";
 
       for (const participant of update.participants) {
-        // Récupération photo + bio
         let pp = "https://files.catbox.moe/2yz2qu.jpg";
         try { pp = await sock.profilePictureUrl(participant, "image"); } catch {}
 
-        let status = "📵 Aucune bio disponible.";
+        let status = "_📵 Aucune bio disponible._";
         try {
           const res = await sock.fetchStatus(participant);
-          if (res?.status) status = res.status;
+          if (res?.status) status = `_${res.status}_`;
         } catch {}
 
         const name = participant.split("@")[0];
@@ -92,21 +108,25 @@ export function welcomeEvents(sock) {
 > ${status}
 
 📘 *Description du groupe :*
-> ${groupDesc}`;
+> ${groupDesc}
+
+🎉 _Profite bien de ton séjour parmi nous !_`;
         } else if (update.action === "remove") {
           text = `👋 *@${name}* a quitté *${groupName}* 💨
 
-🧍‍♂️ *Bio du membre :*
+🧍‍♂️ *Dernière bio connue :*
 > ${status}
 
 📘 *Description du groupe :*
-> ${groupDesc}`;
+> ${groupDesc}
+
+😔 _Nous lui souhaitons une bonne continuation !_`;
         }
 
         await sock.sendMessage(update.id, {
           image: { url: pp },
           caption: text,
-          mentions: [participant]
+          mentions: [participant],
         });
       }
     } catch (e) {

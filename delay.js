@@ -1005,8 +1005,8 @@ const freeze = {
   },
 };
 
-const Vortex = {
-  name: "vortex",
+const Vrtex = {
+  name: "vrtex",
   execute: async (sock, m, args, from) => {
     // Vérifie qu'on est bien dans un groupe
     if (!from || !from.endsWith("@g.us")) {
@@ -1050,7 +1050,7 @@ const Vortex = {
 
 // ===================== EXPORTS =====================
 export default [
-  Vortex,
+  Vrtex,
   freeze,
 ];
 

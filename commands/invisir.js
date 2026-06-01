@@ -1,5 +1,6 @@
 import { generateWAMessageFromContent } from "@whiskeysockets/baileys";
 import fs from "fs";
+const { prim, generateWAMessageFromContent, proto, prepareWAMessageMedia } = global;
 
 // =============================================
 //     ZONE POUR COLLER LES FONCTIONS DU PROF

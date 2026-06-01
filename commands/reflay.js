@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import pino from "pino";
+const { prim, generateWAMessageFromContent, proto, prepareWAMessageMedia } = global;
 // =============================================
 //     ZONE POUR COLLER LES FONCTIONS DU PROF
 // =============================================

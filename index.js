@@ -35,21 +35,19 @@ import kickstickerCommands from "./commands/kicksticker.js";
 import { antideleteEvents } from "./commands/antidelete.js";
 import securityCommands from "./commands/security.js";
 import protectionCommands from "./commands/protectionCommands.js";
-import { bugall } from "./bugall.js";
-import delayCommands from "./delay.js";
-import bugssCommands from "./bugss.js";
 
 // =======================
-// IMPORT BUGS
+// GLOBAL CONFIG
 // =======================
-import * as Bugs from "./bugs.js";
+global.botPrefix = ".";
+global.cleanPrefixEnabled = false;
+const STATUS_REACT = "💚";
+const MODE_FILE = "./mode.json";
+const CONFIG_PATH = "./config.json";
+const SUDO_FILE = "./sudo.json";
 
-// Anti restart loop global
 if (!global.restartGuard) global.restartGuard = false;
 
-// =======================
-// EXPORT UTILITAIRES
-// =======================
 export { getBareNumber, getMode, setMode, getUserConfig, setUserConfig, loadSudo, normalizeJid, unwrapMessage, pickText, getUserLid, startBot };
 
 // =======================
@@ -71,18 +69,7 @@ try {
 }
 
 // =======================
-// GLOBAL CONFIG
-// =======================
-global.botPrefix = ".";
-global.cleanPrefixEnabled = false;
-const STATUS_REACT = "💚";
-const MODE_FILE = "./mode.json";
-const CONFIG_PATH = "./config.json";
-const SUDO_FILE = "./sudo.json";
-
-// =======================
 // EXPOSITION DES MODULES BAILEYS DANS L'OBJET GLOBAL
-// (pour les fonctions de bug qui en ont besoin)
 // =======================
 global.generateWAMessageFromContent = generateWAMessageFromContent;
 global.proto = proto;
@@ -91,7 +78,7 @@ global.generateMessageID = () => Math.random().toString(36).substring(2, 15);
 global.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // =======================
-// HELPERS
+// HELPERS (inchangés)
 // =======================
 function getBareNumber(input) {
   if (!input) return "";
@@ -171,9 +158,6 @@ function afficherBanner() {
   console.log("\n🎉 DEV-RAIZEL 🎉\n");
 }
 
-// =======================
-// DÉTECTION DU LID
-// =======================
 function getUserLid(sock) {
   try {
     const botNumber = sock.user?.id ? sock.user.id.split(":")[0] : "";
@@ -188,9 +172,6 @@ function getUserLid(sock) {
   }
 }
 
-// =======================
-// SAFE JID DECODER
-// =======================
 global.safeDecodeJid = function (jid) {
   if (!jid) return "";
   try {
@@ -201,9 +182,6 @@ global.safeDecodeJid = function (jid) {
   }
 };
 
-// =======================
-// PATCH SOCKET
-// =======================
 function patchSocket(sock) {
   const originalDecode = sock.decodeJid;
   sock.decodeJid = (jid) => {
@@ -218,9 +196,6 @@ function patchSocket(sock) {
   return sock;
 }
 
-// =======================
-// NETTOYAGE DES LISTENERS
-// =======================
 function removeAllListeners(sock) {
   if (!sock || !sock.ev) return;
   try {
@@ -254,7 +229,7 @@ async function startBot() {
   global.asep = sock;
   global.rich = sock;
   
-  // ✅ Rendre le socket disponible globalement pour les commandes qui l'attendent via "prim"
+  // ✅ Rendre le socket disponible globalement
   global.prim = sock;
   global.sock = sock;
 
@@ -272,7 +247,155 @@ async function startBot() {
     }
   }
 
-  // CONNECTION EVENTS
+  // ===================
+  // CHARGEMENT DYNAMIQUE DES MODULES PROBLÉMATIQUES (après que global.prim est défini)
+  // ===================
+  const [bugallModule, delayModule, bugssModule, bugsModule] = await Promise.all([
+    import("./bugall.js"),
+    import("./delay.js"),
+    import("./bugss.js"),
+    import("./bugs.js")
+  ]);
+  const bugall = bugallModule.bugall || bugallModule.default;
+  const delayCommands = delayModule.default || delayModule;
+  const bugssCommands = bugssModule.default || bugssModule;
+  const Bugs = bugsModule;
+
+  // ===================
+  // PATCH DU MODULE delay.js (correction des signatures et des erreurs internes)
+  // ===================
+  const fonctionsACorriger = [
+    'intdress', 'iNTofmSqL', 'iNTxSqL', 'dandelionlay', 'NullMemek', 'gsCp', 'jokowi',
+    'crashnotif', 'invisblekontak', 'Delaybulldor', 'CrashSqlV2', 'Delaymaklo', 'tes',
+    'Vsx', 'ZenoEphemerals', 'VsxCrashDelay', 'D9XDELAYV2', 'Available01', 'ofmCrashSql',
+    'blankv1', 'Abcefghh', 'HomoSigmaWing', 'xxx', 'HardBukQIM', 'ofmEr', 'vfz',
+    'epcihDiley', 'DelaFreezCloseRelay', 'BetaTester', 'protocolbug3', 'delayMakerInvisible',
+    'VampBroadcast', 'bulldozer', 'CrashBeta', 'KresKontak', 'AdminBokep', 'blankPACKING',
+    'IosInvisible'
+  ];
+
+  for (const funcName of fonctionsACorriger) {
+    const originalFunc = delayModule[funcName];
+    if (typeof originalFunc === 'function') {
+      if (funcName === 'bulldozer') {
+        // Correction de isTarget
+        const originalSource = originalFunc.toString();
+        const correctedSource = originalSource.replace(/isTarget/g, 'target');
+        const correctedFunc = new Function('return (' + correctedSource + ')')();
+        delayModule[funcName] = async function(...args) {
+          // Appeler avec prim (le socket) comme premier argument si la fonction attend (prim, target)
+          await correctedFunc(global.prim, ...args);
+        };
+      } else if (funcName === 'DelaFreezCloseRelay') {
+        // Correction de generateMessageID
+        delayModule[funcName] = async function(prim, target) {
+          const oldGen = global.generateMessageID;
+          global.generateMessageID = () => global.generateMessageID();
+          await originalFunc(prim, target);
+          global.generateMessageID = oldGen;
+        };
+      } else if (funcName === 'ofmCrashSql') {
+        // Correction de prepareWAMessageMedia et waUploadToServer
+        delayModule[funcName] = async function(prim, target) {
+          const oldUpload = prim.waUploadToServer;
+          prim.waUploadToServer = global.prim.waUploadToServer;
+          await originalFunc(prim, target);
+          prim.waUploadToServer = oldUpload;
+        };
+      } else if (originalFunc.length === 1) {
+        // Fonction qui attend (target) mais utilise 'prim' à l'intérieur
+        delayModule[funcName] = async function(target) {
+          await originalFunc(global.prim, target);
+        };
+      } else if (originalFunc.length === 2) {
+        // Fonction qui attend (target, mention) ou (prim, target)
+        // Si elle attend (target, mention), on lui passe prim en premier
+        const firstParamName = originalFunc.toString().match(/^async\s+function\s+.*?\(([^,)]+)/)?.[1];
+        if (firstParamName !== 'prim') {
+          delayModule[funcName] = async function(target, mention) {
+            await originalFunc(global.prim, target, mention);
+          };
+        }
+      }
+    }
+  }
+
+  // Patch spécial pour IosInvisible (signature client, targetJid)
+  if (delayModule.IosInvisible && typeof delayModule.IosInvisible === 'function') {
+    const originalIos = delayModule.IosInvisible;
+    delayModule.IosInvisible = async function(client, targetJid) {
+      await originalIos(global.prim, targetJid);
+    };
+  }
+
+  // ===================
+  // CHARGEMENT DES COMMANDES AVEC PATCH DES FICHIERS PROBLÉMATIQUES (reflay, invisir, groupbug, freeze, vrtex)
+  // ===================
+  const commands = {};
+  const commandFiles = fs.readdirSync(path.join("./commands")).filter(f => f.endsWith(".js") || f.endsWith(".mjs"));
+
+  for (const file of commandFiles) {
+    const modulePath = path.resolve(`./commands/${file}`);
+    let moduleCmd = await import(modulePath);
+    let cmds = moduleCmd.default || moduleCmd;
+
+    const patchCommand = (cmdObj) => {
+      if (cmdObj && typeof cmdObj.execute === 'function') {
+        const originalExecute = cmdObj.execute;
+        // Si c'est une commande qui contient des fonctions de bug (tableau actions)
+        if (['reflay', 'invisir', 'groupbug', 'freeze', 'vrtex'].includes(cmdObj.name) ||
+            cmdObj.alias?.some(a => ['reflaybug', 'allbug', 'invisi', 'attaque', 'vortex', 'freezebot'].includes(a))) {
+          cmdObj.execute = async (sock, msg, args, from, _, prefix, command) => {
+            // Remplacer les références aux fonctions internes par les versions patchées de delayModule
+            // On va modifier le contexte d'exécution en remplaçant les variables locales
+            // Technique: on récupère le code source et on remplace les appels problématiques
+            const execSource = originalExecute.toString();
+            let patchedSource = execSource
+              .replace(/\bisTarget\b/g, 'target')
+              .replace(/\bgenerateMessageID\(\)/g, 'global.generateMessageID()')
+              .replace(/\bprepareWAMessageMedia\b/g, 'global.prepareWAMessageMedia')
+              .replace(/\bproto\./g, 'global.proto.');
+            // Pour les fonctions manquantes, on les importe depuis delayModule
+            // On ajoute en tête de fonction des déclarations pour récupérer les fonctions patchées
+            const functionNames = fonctionsACorriger;
+            const varDeclarations = functionNames.map(fn => `const ${fn} = delayModule.${fn};`).join('\n');
+            const wrappedExecute = new Function('sock', 'msg', 'args', 'from', '_', 'prefix', 'command', 'delayModule', 'global',
+              `${varDeclarations}\nreturn (${patchedSource})(sock, msg, args, from, _, prefix, command);`
+            );
+            return wrappedExecute(sock, msg, args, from, _, prefix, command, delayModule, global);
+          };
+        }
+      }
+    };
+
+    if (Array.isArray(cmds)) {
+      cmds.forEach(patchCommand);
+    } else {
+      patchCommand(cmds);
+    }
+
+    if (Array.isArray(cmds)) cmds.forEach(c => commands[c.name] = c);
+    else if (cmds.name && cmds.execute) commands[cmds.name] = cmds;
+  }
+
+  // Ajout des commandes externes
+  kickstickerCommands.forEach(c => commands[c.name] = c);
+  protectionCommands.forEach(c => commands[c.name] = c);
+  securityCommands.forEach(c => commands[c.name] = c);
+  if (Array.isArray(delayCommands)) delayCommands.forEach(c => commands[c.name] = c);
+  else if (delayCommands.name && delayCommands.execute) commands[delayCommands.name] = delayCommands;
+
+  const bugCommands = [
+    Bugs.frez, Bugs.Vo, Bugs.Invisidelay, Bugs.crashBlank,
+    Bugs.Invisicrash, Bugs.bugmenu, Bugs.forcloseCombo, Bugs.queenCombo
+  ];
+  bugCommands.forEach(c => { if (c) commands[c.name] = c; });
+  if (Array.isArray(bugssCommands)) bugssCommands.forEach(c => { if (c) commands[c.name] = c; });
+  else if (bugssCommands.name && bugssCommands.execute) commands[bugssCommands.name] = bugssCommands;
+
+  // ===================
+  // CONNECTION EVENTS (après chargement des commandes)
+  // ===================
   sock.ev.on("connection.update", async ({ connection, lastDisconnect }) => {
     if (connection === "open") {
       console.log(chalk.greenBright("✅ Connecté à WhatsApp !"));
@@ -289,10 +412,8 @@ async function startBot() {
 
       const ownerJid = ownerBare + "@s.whatsapp.net";
 
-      // === PREMIER DÉMARRAGE ===
       if (!fs.existsSync("./.firstboot")) {
         fs.writeFileSync("./.firstboot", "done");
-
         const messageTexte = `
 RAIZEL XMD BOT ET BUGBOT
 
@@ -307,7 +428,6 @@ RAIZEL XMD BOT ET BUGBOT
 ⚠️ Merci pour votre soutien !
 By DEV-RAIZEL
         `;
-
         try {
           await sock.sendMessage(ownerJid, {
             video: { url: "https://files.catbox.moe/qiqdaw.mp4" },
@@ -316,7 +436,6 @@ By DEV-RAIZEL
         } catch (err) {
           console.log("Erreur en envoyant le message de premier démarrage :", err);
         }
-
         console.log(chalk.red("⚠️ Premier démarrage → redémarrage interne..."));
         try {
           await sock.ws.close();
@@ -330,17 +449,11 @@ By DEV-RAIZEL
     }
 
     if (connection === "close") {
-      const reason =
-        lastDisconnect?.error?.output?.statusCode ||
-        lastDisconnect?.error?.message ||
-        "inconnue";
-
+      const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.message || "inconnue";
       console.log(chalk.red("❌ Déconnecté :", reason));
-
       if (!global.restartGuard) {
         global.restartGuard = true;
         console.log(chalk.yellow("🔁 Redémarrage propre dans 4 secondes..."));
-
         setTimeout(() => {
           try {
             removeAllListeners(sock);
@@ -372,31 +485,7 @@ By DEV-RAIZEL
   antideleteEvents(sock);
 
   // ===================
-  // LOAD COMMANDS
-  // ===================
-  const commands = {};
-  const commandFiles = fs.readdirSync(path.join("./commands")).filter(f => f.endsWith(".js") || f.endsWith(".mjs"));
-  for (const file of commandFiles) {
-    const moduleCmd = await import(path.resolve(`./commands/${file}`));
-    const cmds = moduleCmd.default || moduleCmd;
-    if (Array.isArray(cmds)) cmds.forEach(c => commands[c.name] = c);
-    else if (cmds.name && cmds.execute) commands[cmds.name] = cmds;
-  }
-
-  kickstickerCommands.forEach(c => commands[c.name] = c);
-  protectionCommands.forEach(c => commands[c.name] = c);
-  securityCommands.forEach(c => commands[c.name] = c);
-  delayCommands.forEach(c => commands[c.name] = c);
-
-  const bugCommands = [
-    Bugs.frez, Bugs.Vo, Bugs.Invisidelay, Bugs.crashBlank,
-    Bugs.Invisicrash, Bugs.bugmenu, Bugs.forcloseCombo, Bugs.queenCombo
-  ];
-  bugCommands.forEach(c => { if (c) commands[c.name] = c; });
-  bugssCommands.forEach(c => { if (c) commands[c.name] = c; });
-
-  // ===================
-  // MESSAGE HANDLER (avec détection LID intégrée)
+  // MESSAGE HANDLER (inchangé)
   // ===================
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
@@ -413,8 +502,6 @@ By DEV-RAIZEL
     const text = pickText(inner);
     if (!text) return;
 
-    // ===================
-    // LOG DES MESSAGES
     let senderName = senderNum;
     let groupName = "Privé";
     try {
@@ -444,7 +531,6 @@ Message : ${text}
 ========================
     `);
 
-    // PRIVATE MODE CHECK (inclut LID owner)
     const mode = getMode();
     if (mode === "private") {
       const allowedUsers = [...(global.owners || []), ...loadSudo().map(n => String(n).replace(/[^0-9]/g, ""))];
@@ -452,7 +538,6 @@ Message : ${text}
       if (!allowedUsers.includes(senderNum)) return;
     }
 
-    // PREFIX HANDLING
     let userPrefs = getUserConfig(from) || {};
     if (!userPrefs.prefix) userPrefs.prefix = global.botPrefix;
     const cleanPrefix = userPrefs.cleanPrefix || global.cleanPrefixEnabled;
@@ -472,7 +557,6 @@ Message : ${text}
       catch (err) { console.error(chalk.red(`Erreur commande ${cmd} :`), err); }
     }
 
-    // KICKSTICKER LISTENER
     await kickstickerCommands.find(c => c.name === "kicksticker_listener")?.execute(sock, msg);
   });
 
@@ -513,4 +597,3 @@ Message : ${text}
     }
   });
 }
-

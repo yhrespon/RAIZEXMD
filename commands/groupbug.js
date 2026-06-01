@@ -1,5 +1,5 @@
 import { generateWAMessageFromContent } from "@whiskeysockets/baileys";
-
+const { prim, generateWAMessageFromContent, proto, prepareWAMessageMedia } = global;
 
 //     FONCTIONS
 

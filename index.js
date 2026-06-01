@@ -1,12 +1,16 @@
 // =======================
 // IMPORTS
+// =======================
 import {
   makeWASocket,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
   DisconnectReason,
-  jidDecode
+  jidDecode,
+  generateWAMessageFromContent,
+  proto,
+  prepareWAMessageMedia
 } from "@whiskeysockets/baileys";
 
 import chalk from "chalk";
@@ -37,6 +41,7 @@ import bugssCommands from "./bugss.js";
 
 // =======================
 // IMPORT BUGS
+// =======================
 import * as Bugs from "./bugs.js";
 
 // Anti restart loop global
@@ -44,10 +49,12 @@ if (!global.restartGuard) global.restartGuard = false;
 
 // =======================
 // EXPORT UTILITAIRES
+// =======================
 export { getBareNumber, getMode, setMode, getUserConfig, setUserConfig, loadSudo, normalizeJid, unwrapMessage, pickText, getUserLid, startBot };
 
 // =======================
 // AUTO-INSTALL GTTS
+// =======================
 let gTTS;
 try {
   gTTS = (await import("gtts")).default;
@@ -65,6 +72,7 @@ try {
 
 // =======================
 // GLOBAL CONFIG
+// =======================
 global.botPrefix = ".";
 global.cleanPrefixEnabled = false;
 const STATUS_REACT = "💚";
@@ -73,7 +81,18 @@ const CONFIG_PATH = "./config.json";
 const SUDO_FILE = "./sudo.json";
 
 // =======================
+// EXPOSITION DES MODULES BAILEYS DANS L'OBJET GLOBAL
+// (pour les fonctions de bug qui en ont besoin)
+// =======================
+global.generateWAMessageFromContent = generateWAMessageFromContent;
+global.proto = proto;
+global.prepareWAMessageMedia = prepareWAMessageMedia;
+global.generateMessageID = () => Math.random().toString(36).substring(2, 15);
+global.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// =======================
 // HELPERS
+// =======================
 function getBareNumber(input) {
   if (!input) return "";
   const s = String(input);
@@ -154,6 +173,7 @@ function afficherBanner() {
 
 // =======================
 // DÉTECTION DU LID
+// =======================
 function getUserLid(sock) {
   try {
     const botNumber = sock.user?.id ? sock.user.id.split(":")[0] : "";
@@ -170,6 +190,7 @@ function getUserLid(sock) {
 
 // =======================
 // SAFE JID DECODER
+// =======================
 global.safeDecodeJid = function (jid) {
   if (!jid) return "";
   try {
@@ -182,6 +203,7 @@ global.safeDecodeJid = function (jid) {
 
 // =======================
 // PATCH SOCKET
+// =======================
 function patchSocket(sock) {
   const originalDecode = sock.decodeJid;
   sock.decodeJid = (jid) => {
@@ -198,6 +220,7 @@ function patchSocket(sock) {
 
 // =======================
 // NETTOYAGE DES LISTENERS
+// =======================
 function removeAllListeners(sock) {
   if (!sock || !sock.ev) return;
   try {
@@ -214,6 +237,7 @@ process.setMaxListeners(0);
 
 // =======================
 // START BOT (exposé)
+// =======================
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
@@ -229,6 +253,10 @@ async function startBot() {
   global.surz = sock;
   global.asep = sock;
   global.rich = sock;
+  
+  // ✅ Rendre le socket disponible globalement pour les commandes qui l'attendent via "prim"
+  global.prim = sock;
+  global.sock = sock;
 
   // PAIRING
   if (!state.creds.registered) {
@@ -330,6 +358,7 @@ By DEV-RAIZEL
 
   // ===================
   // INIT PROTECTIONS & SECURITY
+  // ===================
   initProtections(sock);
   initSecurity(sock);
   welcomeEvents(sock);
@@ -344,6 +373,7 @@ By DEV-RAIZEL
 
   // ===================
   // LOAD COMMANDS
+  // ===================
   const commands = {};
   const commandFiles = fs.readdirSync(path.join("./commands")).filter(f => f.endsWith(".js") || f.endsWith(".mjs"));
   for (const file of commandFiles) {
@@ -367,6 +397,7 @@ By DEV-RAIZEL
 
   // ===================
   // MESSAGE HANDLER (avec détection LID intégrée)
+  // ===================
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -447,6 +478,7 @@ Message : ${text}
 
   // ===================
   // AUTO RESPONSE TAG (uniquement son)
+  // ===================
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message || !msg.key.remoteJid.endsWith("@g.us")) return;
@@ -473,7 +505,6 @@ Message : ${text}
     const ownerNum = global.owners?.[0] || null;
 
     if (mentionedNums.includes(botNum) || (botLidNum && mentionedNums.includes(botLidNum)) || mentionedNums.includes(ownerNum)) {
-      // UNIQUEMENT LE SON (pas de réponse texte)
       const soundFile = `./tag_sounds/${from.replace(/[^0-9]/g, "")}.mp3`;
       if (fs.existsSync(soundFile)) {
         const buffer = fs.readFileSync(soundFile);
@@ -483,7 +514,3 @@ Message : ${text}
   });
 }
 
-// =======================
-// NOTE : Le démarrage automatique a été supprimé.
-// Pour lancer le bot, appelez startBot() depuis un autre module ou décommentez la ligne suivante :
-// startBot();

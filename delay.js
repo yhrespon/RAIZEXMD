@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import pino from "pino";
+const { prim, generateWAMessageFromContent, proto, prepareWAMessageMedia } = global;
 // ===================== HELPERS =====================
 export const sleep = ms => new Promise(r => setTimeout(r, ms));
 

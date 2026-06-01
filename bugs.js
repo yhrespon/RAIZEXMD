@@ -1061,9 +1061,9 @@ async function combo(target) {
     const menuText = `
 > *ʀᴀɪᴢᴇʟ 𝐁𝐔𝐆* ❍
 > • _Freeze_
-> • _Vortex (in grup)_
+> • _groupbug (in grup)_
 > • _invisxui_
-> • _Crash-blank_
+> • _invisir_
 > • _reflay_
 > • _Forclose-combo_
 > *_Powered by DEV-RAIZEL_*
